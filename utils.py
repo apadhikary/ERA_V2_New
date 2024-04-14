@@ -79,7 +79,7 @@ class dataset_cifar10:
         testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=album_Compose_test())
         testloader = torch.utils.data.DataLoader(testset, **self.dataloader_args)
         
-        return(trainset, trainloader, testset, testloader)
+        return(trainloader, testloader)
 
     #Display Images   
     def sample_pictures(self, train_loader, return_flag = False):
@@ -96,7 +96,6 @@ class dataset_cifar10:
             unnormalize(images[index])
             ax.set_title(self.classes[labels[index]])
 
-        return images, labels
 
 def unnormalize(img):
     channel_means = (0.4914, 0.4822, 0.4471)
