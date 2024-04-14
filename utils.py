@@ -1,5 +1,5 @@
 import numpy as np
-%matplotlib inline
+#%matplotlib inline
 import matplotlib.pyplot as plt
 import torch
 from albumentations import Compose, PadIfNeeded, RandomCrop, Normalize, HorizontalFlip, VerticalFlip, ShiftScaleRotate, Cutout, CoarseDropout
