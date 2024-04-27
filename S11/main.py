@@ -8,13 +8,8 @@ import torchvision
 from torchvision import datasets, transforms
 
 from torch.optim.lr_scheduler import StepLR
-from torch.optim.lr_scheduler import OneCycleLR
-from torch_lr_finder import LRFinder
 
 import os
-
-from models import *
-from utils import *
 from tqdm import tqdm
 
 
@@ -58,6 +53,8 @@ class train:
 
             pbar.set_description(desc= f'Loss={loss.item()} Batch_id={batch_idx} Accuracy={100*correct/processed:0.2f}')
             self.train_acc.append(100*correct/processed)
+        
+        return (loss, correct, processed)
 
 #Testing
 class test:
@@ -66,7 +63,6 @@ class test:
         self.test_losses = []
 
     def test(self,model, device, test_loader):
-
         model.eval()
         test_loss = 0
         correct = 0
@@ -74,7 +70,7 @@ class test:
             for data, target in test_loader:
                 data, target = data.to(device), target.to(device)
                 output = model(data)
-                criterion = nn.CrossEntropyLoss(reduction='sum')
+                criterion = nn.CrossEntropyLoss()
                 test_loss += criterion(output, target).item()  # sum up batch loss
                 pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
                 correct += pred.eq(target.view_as(pred)).sum().item()
@@ -87,37 +83,15 @@ class test:
             100. * correct / len(test_loader.dataset)))
 
         self.test_acc.append(100. * correct / len(test_loader.dataset))
-  
-def optimizer_scheduler(model, choice,max_lr):
-    if choice == 'SGD':  
-        optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
-        scheduler = StepLR(optimizer, step_size=6, gamma=0.1)
-    elif choice == 'ADAM':
-        optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
-        scheduler = OneCycleLR(optimizer, max_lr = max_lr, epochs = 20, steps_per_epoch=len(train_loader), div_factor = 10,
-                       final_div_factor = 50, pct_start = 5/20, anneal_strategy = 'linear',three_phase = False)
 
+        return (test_loss,correct)
 
-        
-
-
-
-
-
-
-
-
-model = net().to(device)
-optimizer = optim.Adam(model.parameters(), lr=0.03, weight_decay=1e-4)
-criterion = nn.CrossEntropyLoss()
-lr_finder = LRFinder(model, optimizer, criterion, device="cuda")
-lr_finder.range_test(train_loader, end_lr=10, num_iter=200, step_mode="exp")
-lr_finder.plot() # to inspect the loss-learning rate graph
-lr_finder.reset() # to reset the model and optimizer to their initial state
-
-EPOCHS = 20
-for epoch in range(EPOCHS):
-    print("EPOCH:", epoch)
-    train(net, device, trainloader, optimizer, epoch)
-    scheduler.step()
-    test(net, device, testloader)
+class get_lr:
+    def __init__(self, optimizer):
+        self.optimizer = optimizer
+        """
+        Function to track learning rate while model training
+        :param optimizer: Optimizer used for training
+        """
+        for param_group in self.optimizer.param_groups:
+            return param_group['lr']

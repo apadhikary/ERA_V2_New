@@ -1,4 +1,5 @@
 import numpy as np
+#%matplotlib inline
 import matplotlib.pyplot as plt
 import torch
 from albumentations import Compose, PadIfNeeded, RandomCrop, Normalize, HorizontalFlip, VerticalFlip, ShiftScaleRotate, Cutout, CoarseDropout
@@ -14,10 +15,12 @@ from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 from pl_bolts.datamodules import CIFAR10DataModule
 
+import pandas as pd
+import seaborn as sn
+from sklearn.metrics import confusion_matrix
+
 
 import os
-from models import *
-from utils import *
 from tqdm import tqdm
 
 # Image Transformation
@@ -81,18 +84,25 @@ class dataset_cifar10:
         return(trainloader, testloader)
 
     #Display Images   
-    def sample_pictures(self, train_loader, return_flag = False):
-        dataiter = iter(train_loader)
+    def sample_pictures(self, data_loader, train_flag = True, return_flag = False):
+        dataiter = iter(data_loader)
         images, labels = next(dataiter)
         images = images.numpy() # convert images to numpy for display
 
-        fig = plt.figure(figsize=(25, 20))
+        def imshow(img):
+            channel_means = [0.4914, 0.4822, 0.4471]
+            channel_std = [0.2469, 0.2433, 0.2615]
+
+            for i in range(img.shape[0]):
+                img[i]=(img[i]*channel_std[i])+channel_means[i]
+                plt.imshow(np.transpose(img, (1,2,0)))
+
+        fig = plt.figure(figsize=(25, 25))
         fig.tight_layout()
-        plt.show()
-        num_of_images = 20
+        num_of_images = 25 if train_flag else 5
         for index in range(1, num_of_images + 1):
-            ax = fig.add_subplot(4, 5, index, xticks=[], yticks=[])
-            unnormalize(images[index])
+            ax = fig.add_subplot(5, 5, index, xticks=[], yticks=[])
+            imshow(images[index])
             ax.set_title(self.classes[labels[index]])
 
 
@@ -327,5 +337,43 @@ def plot_grad_cam_images(model, test_loader, classes, device):
         sub.set_title("Actual: {}, Pred: {}".format(actual_labels[i], predicted_labels[i]),color='red')
     plt.tight_layout()
     plt.show()
+
+    # ---------------------------- Confusion Matrix ----------------------------
+def visualize_confusion_matrix(classes: list[str], device: str, model: 'DL Model',
+                               test_loader: torch.utils.data.DataLoader):
+    """
+    Function to generate and visualize confusion matrix
+    :param classes: List of class names
+    :param device: cuda/cpu
+    :param model: Model Architecture
+    :param test_loader: DataLoader for test set
+    """
+    nb_classes = len(classes)
+    device = 'cuda'
+    cm = torch.zeros(nb_classes, nb_classes)
+
+    model.eval()
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            model = model.to(device)
+
+            preds = model(inputs)
+            preds = preds.argmax(dim=1)
+
+        for t, p in zip(labels.view(-1), preds.view(-1)):
+            cm[t, p] = cm[t, p] + 1
+
+    # Build confusion matrix
+    labels = labels.to('cpu')
+    preds = preds.to('cpu')
+    cf_matrix = confusion_matrix(labels, preds)
+    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None],
+                         index=[i for i in classes],
+                         columns=[i for i in classes])
+    plt.figure(figsize=(12, 7))
+    sn.heatmap(df_cm, annot=True)
+
 
 
