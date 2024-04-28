@@ -154,34 +154,37 @@ def plot_loss_accuracy_graph(trainObj, testObj, EPOCHS):
 
 def plot_loss_accuracy_graph_OneCLR(trainAcc, trainLoss, testAcc, testLoss):
 
-    fig, ax = plt.subplots(1, 2, figsize=(15, 5))
+    fig, ax = plt.subplots(2, 2, figsize=(15, 5))
 
     # Loss Plot
-    ax[0].plot(trainLoss, label='Training Loss')
-    ax[0].set_xlabel('Epochs')
-    ax[0].set_ylabel('Loss')
-    ax[0].set_title('Loss vs. Epochs')
-    ax[0].legend()
+    ax[0,0].plot(trainLoss, label='Training Loss')
+    ax[0,0].set_xlabel('Epochs')
+    ax[0,0].set_ylabel('Loss')
+    ax[0,0].set_title('Loss vs. Epochs')
+    ax[0,0].legend()
 
-    ax2 = ax[0].twinx()
-    ax2.plot(testLoss, label='Test Loss', color='red')
-    ax2.set_ylabel('Loss')
-    ax2.legend(loc='center right')
+    ax[0,1].plot(testLoss, label='Testing Loss')
+    ax[0,1].set_xlabel('Epochs')
+    ax[0,1].set_ylabel('Loss')
+    ax[0,1].set_title('Loss vs. Epochs')
+    ax[0,1].legend()
 
     # Accuracy Plot
-    ax[1].plot(trainAcc, label='Training Accuracy')
-    ax[1].set_xlabel('Epochs')
-    ax[1].set_ylabel('Accuracy')
-    ax[1].set_title('Accuracy vs. Epochs')
-    ax[1].legend()
+    ax[1,0].plot(trainAcc, label='Training Accuracy')
+    ax[1,0].set_xlabel('Epochs')
+    ax[1,0].set_ylabel('Accuracy')
+    ax[1,0].set_title('Accuracy vs. Epochs')
+    ax[1,0].legend()
 
-    ax2 = ax[1].twinx()
-    ax2.plot(testAcc, label='Test Accuracy', color='red')
-    ax2.set_ylabel('Accuracy')
-    ax2.legend(loc='center right')
+    ax[1,1].plot(testAcc, label='Testing Accuracy')
+    ax[1,1].set_xlabel('Epochs')
+    ax[1,1].set_ylabel('Accuracy')
+    ax[1,1].set_title('Accuracy vs. Epochs')
+    ax[1,1].legend()
 
     plt.tight_layout()
     plt.show()  
+
 
 # Evaluating Train and Test Accuracy
 import torch
