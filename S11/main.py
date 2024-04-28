@@ -86,12 +86,12 @@ class test:
 
         return (test_loss,correct)
 
-class get_lr:
-    def __init__(self, optimizer):
-        self.optimizer = optimizer
-        """
-        Function to track learning rate while model training
-        :param optimizer: Optimizer used for training
-        """
-        for param_group in self.optimizer.param_groups:
-            return param_group['lr']
+# class get_lr:
+#     def __init__(self, optimizer):
+#         self.optimizer = optimizer
+#         """
+#         Function to track learning rate while model training
+#         :param optimizer: Optimizer used for training
+#         """
+#         for param_group in self.optimizer.param_groups:
+#             return param_group['lr']
