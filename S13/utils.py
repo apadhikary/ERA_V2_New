@@ -2,7 +2,7 @@ import numpy as np
 #%matplotlib inline
 import matplotlib.pyplot as plt
 import torch
-from albumentations import Compose, PadIfNeeded, RandomCrop, Normalize, HorizontalFlip, VerticalFlip, ShiftScaleRotate, Cutout, CoarseDropout
+from albumentations import Compose, PadIfNeeded, RandomCrop, Normalize, HorizontalFlip, VerticalFlip, ShiftScaleRotate, CoarseDropout
 from albumentations.pytorch.transforms import ToTensorV2
 
 from pytorch_grad_cam.base_cam import BaseCAM
