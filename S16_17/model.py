@@ -38,7 +38,7 @@ class InputEmbeddings(nn.Module):
   def forward(self,x):
     return self.embedding(x) * math.sqrt(self.d_model)
   
-class PostionEmbedding(nn.Module):
+class PositionalEmbedding(nn.Module):
   def __init__(self, d_model: int, seq_len: int, dropout: float):
     super().__init__()
     self.d_model = d_model
