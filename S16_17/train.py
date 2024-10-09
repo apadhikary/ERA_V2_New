@@ -1,6 +1,6 @@
-from ERA_V2_New.S16_17.model import build_transformer
-from ERA_V2_New.S16_17.dataset import BillingualDataset, casual_mask
-from ERA_V2_New.S16_17.config_file import get_config, get_weights_file_path
+from model import build_transformer
+from dataset import BillingualDataset, casual_mask
+from config_file import get_config, get_weights_file_path
 
 import torchtext.datasets as datasets
 import torch
